@@ -27,7 +27,7 @@ Array.sort(array);
 Console.WriteLine(array); // [1, 2, 3]
 ```
 
-### ?について
+## ?について
 
 - C#の??（ダブルクエスチョンマーク）は null 合体演算子
 
@@ -36,3 +36,18 @@ Console.WriteLine(array); // [1, 2, 3]
     ```c#
 
     ```
+
+## VScode で開発を行う場合
+
+### XML ドキュメントコメント
+
+通常 VScode では documentationComment は自動補完されない。
+
+```C#
+/// <summary>
+///
+/// </summary>
+```
+
+こうゆうやつ。
+しかし拡張機能の「C# XML Documentation Comments」を導入することで`///`を入力することで自動保管することができる。便利。
