@@ -215,6 +215,54 @@ https://firebase.google.com/docs/firestore/quickstart?hl=ja
    firebaseConfig には ApiKey や projectId など firebase との通信に必要な情報を記載する。
    `initializeApp()`で Firebase、`getFirestore()`で FireStore の初期化を行う。
 
+#### 更新
+
+##### setDoc
+
+setDoc 関数を使用する場合は DocumentRefarence を使用して更新を行う。
+指定したドキュメント ID が存在する場合は更新、存在しない場合は登録となる。
+
+```ts
+/**
+ * ユーザードキュメントの登録
+ * @param user ユーザー情報
+ */
+export const addUser = async (user: User) => {
+  try {
+    const db = getFirestore(firebaseApp);
+    const docRef = doc(db, "user", user.uid);
+    await setDoc(docRef, user);
+  } catch (e) {
+    console.log(e);
+  }
+};
+```
+
+##### addDoc
+
+addDoc を使用する場合は Collection Refarence を使用して更新を行う。
+ドキュメント ID を指定しないため、FireStore 側で最適化された ID が自動採番されて登録される。
+
+```ts
+/**
+ * ユーザードキュメントの登録
+ * @param user ユーザー情報
+ */
+export const addUser = async (user: User) => {
+  try {
+    const db = getFirestore(firebaseApp);
+    const colRef = collection(db, "user");
+    await addDoc(colRef, user);
+  } catch (e) {
+    console.log(e);
+  }
+};
+```
+
+ドキュメント ID を自動採番とする場合、ID を指定して更新を行う際に一度ドキュメント ID を取得してから更新を行う必要があり処理工程が１つ増えるため、基本的に ID を指定して更新を行う要件のあるドキュメントについては setDoc を使用し、ドキュメント ID を指定して登録を行う。
+履歴データやログデータなど ID 指定での更新や取得を行う要件のないデータについては addDoc を用いた ID 自動採番での登録を行う。
+（ドキュメント ID を指定する際は HotSpot が発生しないような値とすること。[https://firebase.google.com/docs/firestore/best-practices?hl=ja#hotspots]）
+
 ### StyledFirebaseAuth
 
 https://github.com/firebase/firebaseui-web-react
@@ -289,6 +337,22 @@ https://github.com/firebase/firebaseui-web-react
 1. コンポーネントの責務がより明確になる
 1. 見た目の粒度だけでなく、ロジックの責務も明確にできる
 1. 開発を進める中で、粒度が合わない場合は templates と organisms を統合/削除するなどして対応する。
+
+### Atoms
+
+最小単位のコンポーネントを定義する。基本的に HTML タグひとつが１つのコンポーネントとなるイメージ。（Label, Button, Checkbox 等）
+
+### molecules
+
+複数の Atoms が組み合わさってできるコンポーネントを定義する。molecules にはドメイン知識を持たないより汎用的なコンポーネントのみ定義する。(Card, CheckboxList, Modal 等)
+
+### organisms
+
+複数の Atoms が組み合わさってできるコンポーネントを定義する。organisms にはドメイン知識を持つコンポーネントを定義する。(UserCardList, OccupationCheckBoxList 等)
+
+### templates
+
+内容を持たないレイアウトのみのコンポーネントを定義する。(MainContent, SideMenu 等)
 
 ### 参考
 
@@ -365,7 +429,7 @@ https://emotion.sh
    yarn add @emotion/react @emotion/babel-plugin
    ```
 
-1. basel の設定
+1. babel の設定
 
    1. next.js のトップディレクトリに.babelrc (babel の設定ファイル)を作成する。
    2. .babelrc にインストールした@emotion/babel-plugin を記載する。
@@ -397,6 +461,27 @@ https://emotion.sh
        "types": ["@emotion/react/types/css-prop"]
      }
    }
+   ```
+
+1. @emotion/babel-preset-css-prop のインストール
+
+```bash
+yarn add @emotion/babel-preset-css-prop
+```
+
+1. StoryBooks の設定
+
+   main.js に babel の設定を記載し Emotion のスタイルが適応されるようにする。
+
+   ```js
+   config.module.rules.push({
+     test: /\.(ts|tsx)$/,
+     loader: require.resolve("babel-loader"),
+     options: {
+       cacheDirectory: true,
+       presets: [require.resolve("@emotion/babel-preset-css-prop")],
+     },
+   });
    ```
 
 ### 使用方法
@@ -474,7 +559,7 @@ https://mui.com
       yarn add @mui/icons-material
       ```
 
-2. src/lib/ に mui-theme.ts を作成し、サイト全体に適応する MUI テーマを設定する
+2. src/libs/ に mui-theme.ts を作成し、サイト全体に適応する MUI テーマを設定する
 
    ```ts
    import { createTheme } from "@mui/material/styles";
@@ -658,6 +743,36 @@ https://mui.com
        emotionStyleTags,
      };
    };
+   ```
+
+### MUI のテーマを Storybook に反映させる
+
+1. MUI のテーマを作成する（手順上記参照）
+1. preview.js に ThemeProvider を記述
+
+   Storybook のデコレータという機能を使って、Storybook のプレビュー全体を MUI の ThemeProvider コンポーネントで囲む。
+
+   ```js
+   export const decorators = [
+     (Story) => {
+       return (
+         <ThemeProvider theme={muiTheme}>
+           <CssBaseline />
+           <Story />
+         </ThemeProvider>
+       );
+     },
+   ];
+   ```
+
+1. main.js の設定を変更
+
+   features というプロパティの emotionAlias を false にする。
+
+   ```js
+   features: {
+     emotionAlias: false,
+   },
    ```
 
 ### 参考
