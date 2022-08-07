@@ -80,4 +80,22 @@
   >
   > Instead, err on the side of clarity, and use another line to express the nested operation as a separate statement.
 
--
+- **Correct this '|' to '||'.**
+
+  真偽値に対する条件は短絡評価を使用する。
+
+  > The use of non-short-circuit logic in a boolean context is likely a mistake - one that could cause serious program errors as conditions are evaluated under the wrong circumstances.
+
+- **'System.SystemException' should not be thrown by user code.**
+
+  > Throwing such general exceptions as Exception, SystemException, ApplicationException, IndexOutOfRangeException, NullReferenceException, OutOfMemoryException and ExecutionEngineException prevents calling methods from handling true, system-generated exceptions differently than application-generated errors.
+
+- **Remove the member initializer, all constructors set an initial value for the member.**
+
+  > コンストラクタ内で初期化しているメンバーについてはデフォルト値の設定は削除する。
+
+- **Member 'GetCartInfoActionResult' does not access instance data and can be marked as static**
+
+  インスタンスの生成等を行わない静的メソッドには static 修飾子を付与する。
+
+  > Members that do not access instance data or call instance methods can be marked as static. After you mark the methods as static, the compiler will emit nonvirtual call sites to these members. This can give you a measurable performance gain for performance-sensitive code.
