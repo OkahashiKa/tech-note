@@ -167,6 +167,82 @@ export const SampleButton: ComponentStory<typeof Button> = () => (
 );
 ```
 
+## Jest
+
+https://jestjs.io/ja
+
+### Setup
+
+1. 必要パッケージのインストール
+
+   ```bash
+   yarn add -D jest @testing-library/react @testing-library/jest-dom @types/jest
+   ```
+
+2. 設定ファイルの作成と編集
+
+   プロジェクトルートに jest.config.js を作成します。
+
+   ```js
+   const nextJest = require("next/jest");
+
+   const createJestConfig = nextJest({
+     dir: "./",
+   });
+
+   // Jestのカスタム設定を設置する場所。従来のプロパティはここで定義。
+   const customJestConfig = {
+     moduleNameMapper: {
+       "^@/(.*)$": "<rootDir>/$1",
+     },
+     moduleDirectories: ["node_modules"],
+     testEnvironment: "jest-environment-jsdom",
+     collectCoverageFrom: [
+       "**/*.{js,jsx,tsx}",
+       "!**/node_modules/**",
+       "!./jest.config.js",
+       "!**/stories/**",
+     ],
+     rootDir: "src/",
+     coverageDirectory: "../coverage",
+     coverageReporters: ["html"],
+   };
+
+   // createJestConfigを定義することによって、本ファイルで定義された設定がNext.jsの設定に反映されます
+   module.exports = createJestConfig(customJestConfig);
+   ```
+
+   - createJestConfig の dir には next.config.js とテスト環境用の.env ファイルが配置されたディレクトリをセット。基本は"./"で良い。
+   - moduleNameMapper は tscongig.json の定義に合わせてパスのエイリアスを設定する。
+   - collectCoverageFrom でカバレッジ対象ファイルと対象外ファイルの設定を行う。
+   - rootDir に`/src`を設定しソースコードのみをテスト対象とする。
+   - coverageDirectory でカバレッジ取得結果の出力先を設定する。
+
+3. package.json にスクリプトを追加する
+
+   ```json
+   "test": "jest --coverage",
+   ```
+
+4. TS に jest の型情報の追加を行う
+
+   tsconfing に jest の型情報を追加する設定を行う。
+
+   ```json
+   "test": ["@types/jest"],
+   ```
+
+### jest の実行
+
+```bash
+yarn test
+```
+
+上記のコマンドで.spec.tsx, .spec.ts の単体テストが実行され、コンソール上に結果が表示されます。
+![yarn test](image/2022-08-07-23-34-30.png)
+またルート直下に coverage ディレクトリが作成されその中の index.html からカバレッジが確認できます。
+![coverage/index.html](image/2022-08-07-23-35-51.png)
+
 ## Firebase
 
 https://firebase.google.com
@@ -177,17 +253,17 @@ https://firebase.google.com/docs/web/setup
 
 1. Firebase プロジェクトを作成する。
 
-   - [Firebase コンソール](https://console.firebase.google.com/)
+- [Firebase コンソール](https://console.firebase.google.com/)
 
 2. アプリケーションをの登録を行う。
 
-   - アプリを登録した際に表示される Config 情報はコピーしておく。
+- アプリを登録した際に表示される Config 情報はコピーしておく。
 
 3. FirebaseSDK のインストール
 
-   ```bash
-   yarn add firebase
-   ```
+```bash
+yarn add firebase
+```
 
 ### FireStore
 
