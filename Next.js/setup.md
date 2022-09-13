@@ -412,7 +412,7 @@ https://github.com/firebase/firebaseui-web-react
 1. コンポーネント開発を Storybook を用いて行うため、親和性が高い
 1. コンポーネントの責務がより明確になる
 1. 見た目の粒度だけでなく、ロジックの責務も明確にできる
-1. 開発を進める中で、粒度が合わない場合は templates と organisms を統合/削除するなどして対応する。
+1. 開発を進める中で、粒度が合わない場合は templates と organisms を統合/削除するなどして対応する
 
 ### Atoms
 
@@ -861,3 +861,12 @@ https://mui.com
 css props のオブジェクト記法でスタイルを記載する場合は、@mui/material/\*\*にスタイルのプロパティが定義されており、JSDoc にサンプルも記載されているので参考にしながら記載する。
 
 ![@mui/material/colorsのJSDoc](image/2022-02-19-23-54-49.png)
+
+## 状態管理
+
+今回は以下の理由から状態管理ツールとして ReactHooks の useContext を使用する。
+
+- Redux は概念が多く、ディレクトリもコード量も増大しバンドルも重くなる
+- 開発規模が小規模であるため、Redux や Recoil の恩恵を受けづらい
+- useContext は記載量、前提知識が少なく実装、保守が容易
+- ReactHooks のためライブラリを必要としない
