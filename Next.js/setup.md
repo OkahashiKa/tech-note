@@ -866,7 +866,59 @@ css props のオブジェクト記法でスタイルを記載する場合は、@
 
 今回は以下の理由から状態管理ツールとして ReactHooks の useContext を使用する。
 
-- Redux は概念が多く、ディレクトリもコード量も増大しバンドルも重くなる
+- Redux は Fulux 等の概念が多く学習コストが高く、ディレクトリもコード量も増大しバンドルも重くなる
 - 開発規模が小規模であるため、Redux や Recoil の恩恵を受けづらい
 - useContext は記載量、前提知識が少なく実装、保守が容易
 - ReactHooks のためライブラリを必要としない
+
+### useContext の使い方
+
+1. src/contexts 配下に状態管理したいオブジェクトの Provider を作成する。
+
+   ```tsx
+   import { User } from "@/models/user.model";
+   import React, { createContext, ReactNode, useState } from "react";
+
+   export const LoginUserContext = createContext({} as LoginUser);
+
+   type LoginUser = {
+     loginUser: User;
+     setLoginUser: React.Dispatch<React.SetStateAction<User>>;
+   };
+
+   type Props = {
+     children: ReactNode;
+   };
+
+   export const LoginUserProvider = (props: Props) => {
+     const [loginUser, setLoginUser] = useState<User>({} as User);
+     return (
+       <LoginUserContext.Provider value={{ loginUser, setLoginUser }}>
+         {props.children}
+       </LoginUserContext.Provider>
+     );
+   };
+   ```
+
+2. src/Contexts/storeProvider.tsx の JSX 内に追加した Provider を追記する。
+
+   ```tsx
+   export const StoreProvider = (props: Props) => {
+     return (
+       <LoginUserProvider>
+         <OccupationListProvider>
+           <IndustryListProvider>{props.children}</IndustryListProvider>
+         </OccupationListProvider>
+       </LoginUserProvider>
+     );
+   };
+   ```
+
+3. 使用したいコンポーネント内で useContext を用いることで GlobalState を使用できる。
+
+   ```tsx
+   const { loginUser, setLoginUser } = useContext(LoginUserContext);
+   ```
+
+- アプリケーション全体ではなく一部のみで useContext を使いたい場合は StoreProvider に追記せず、直接使用したいコンポーネントを Provider のタグで囲う。
+- State 以外も使用できるため再設定の必要なないマスタ情報等の値は、静的なオブジェクトとして定義することも可能。

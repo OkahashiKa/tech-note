@@ -248,7 +248,7 @@ ng add @angular/material
 
 ![ngrx](image/state-management-lifecycle.png)
 
-## NGSX
+## NGXS
 
 <https://www.ngxs.io/>
 
